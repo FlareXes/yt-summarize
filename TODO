@@ -1,5 +1,5 @@
 1. Prompt
-    - Store Prompts Externally
+    - Store Prompts Externally - Done
     - Multiple Prompts
     - Custom Prompt
 2. Links
@@ -12,6 +12,6 @@
     - API URL
 
 4. Do First
-    - Download Subtitle Under /tmp/ Directory
-    - Rewrite Codebase
-    - Create README.md
+    - Download Subtitle Under /tmp/ Directory - Done
+    - Rewrite Codebase - Done
+    - Create README.md - Done
