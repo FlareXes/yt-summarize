@@ -4,12 +4,12 @@
     - Custom Prompt
 2. Links
     - Check URL Validity
-    - Handle Multipe URLs
+    - Handle Multipe URLs - Done
     - Output Response
         - Format: {Title (Link) \n Summary}
 3. Custom Yt-Summarize Config
-    - Model Selection
-    - API URL
+    - Model Selection - Done
+    - API URL - Done
 
 4. Do First
     - Download Subtitle Under /tmp/ Directory - Done
