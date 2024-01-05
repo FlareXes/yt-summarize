@@ -3,14 +3,14 @@
     - Multiple Prompts
     - Custom Prompt
 2. Links
-    - Check URL Validity
+    - Check URL Validity - Done
+    - Handle Subtitle LOC Proplerly - Done
     - Handle Multipe URLs - Done
     - Output Response
         - Format: {Title (Link) \n Summary}
 3. Custom Yt-Summarize Config
     - Model Selection - Done
     - API URL - Done
-
 4. Do First
     - Download Subtitle Under /tmp/ Directory - Done
     - Rewrite Codebase - Done
