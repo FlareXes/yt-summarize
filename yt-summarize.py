@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+
+import re
 import os
 import re
 import requests
 import argparse
 import yt_dlp
 import json
+from itertools import groupby
 
 MODEL = "starling-lm"
 API_URL = "http://localhost:11434/api/generate"
@@ -14,6 +17,39 @@ SUBTITLE_OUTPUT_DIR = "/tmp/subtitle"
 # Options: `basic`, `basic-2`, `detailed`
 PROMPT_NAME = "detailed"
 PROMPT_JSON_LOC = "./prompts.json"
+
+
+def download_subtitle(url, subtitle_filename):
+    ydl_opts = {
+        "skip_download": True,
+        "outtmpl": {"default": subtitle_filename},
+        "writesubtitles": True,
+        "writeautomaticsub": True,
+        "subtitleslangs": ["en"],
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.extract_info(url)
+
+
+def clean_subtitles(subtitle_text):
+    # Remove subtitles enclosed in <c> tags
+    subtitle_text = re.sub(r".*<c>.*</c>.*", "", subtitle_text)
+
+    # Remove timestamps, alignments, positions, and other tags
+    subtitle_text = re.sub(
+        r"<.*?>|\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}|align:[^ ]*|position:[^ ].",
+        "",
+        subtitle_text,
+    )
+
+    # Remove extra spaces and newlines
+    subtitle_text = re.sub(r"(\n\s*){2,}", "\n", subtitle_text)
+
+    # Remove consecutive duplicate lines
+    subtitle_text = [key for key, group in groupby(subtitle_text.split("\n"))]
+
+    return " ".join(map(str, subtitle_text))
 
 
 def get_prompt():
@@ -29,7 +65,7 @@ def get_prompt():
 def generate_prompt(subtitle_filename):
     try:
         with open(f"{subtitle_filename}.en.vtt", "r") as f:
-            subtitle = f.read()
+            subtitle = clean_subtitles(f.read())
     except FileNotFoundError as e:
         print(e)
         exit(1)
@@ -38,19 +74,6 @@ def generate_prompt(subtitle_filename):
 
     sep = "\n\n-----------------------\n\n"
     return subtitle + sep + prompt
-
-
-def download_subtitle(url, subtitle_filename):
-    ydl_opts = {
-        "skip_download": True,
-        "outtmpl": {"default": subtitle_filename},
-        "writesubtitles": True,
-        "writeautomaticsub": True,
-        "subtitleslangs": ["en"],
-    }
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.extract_info(url)
 
 
 def summarize(prompt):
@@ -92,8 +115,7 @@ def process(args):
         os.mkdir(SUBTITLE_OUTPUT_DIR)
 
     for link in args.youtube_links:
-        pattern = re.compile(
-            r"(?:https?://)?(?:www\.)?(?:youtube\.com/.*?\bv=|youtu\.be/|youtube\.com/embed/)([a-zA-Z0-9_-]{11})\b")
+        pattern = re.compile(r"(?:https?://)?(?:www\.)?(?:youtube\.com/.*?\bv=|youtu\.be/|youtube\.com/embed/)([a-zA-Z0-9_-]{11})\b")
         match = pattern.search(link)
         if match:
             yt_id = match.group(1)
@@ -115,18 +137,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="yt-summarizer",
         description="Command line utility to summarize YouTube videos from subtitles.",
-        formatter_class=lambda prog: argparse.HelpFormatter(
-            prog, max_help_position=47)
+        formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=47),
     )
 
-    parser.add_argument("-m", "--model", nargs="?", type=str,
-                        help="Model Nane", default=None)
-    parser.add_argument("-u", "--url", nargs="?", type=str,
-                        help="API URL", default=None)
-    parser.add_argument("--prompt-name", nargs="?", type=str,
-                        help="Prompt Name Specified In Prompt Json File", default=None)
-    parser.add_argument("--subtitle-dir", nargs="?", type=str,
-                        help="Subtitles Ouput Directory", default=None)
+    parser.add_argument("-m", "--model", nargs="?", type=str, help="Model Nane", default=None)
+    parser.add_argument("-u", "--url", nargs="?", type=str, help="API URL", default=None)
+    parser.add_argument("--prompt-name", nargs="?", type=str, help="Prompt Name Specified In Prompt Json File", default=None)
+    parser.add_argument("--subtitle-dir", nargs="?", type=str, help="Subtitles Ouput Directory", default=None)
     parser.add_argument("youtube_links", nargs="+", help="YouTube Video Link")
 
     args = parser.parse_args()
