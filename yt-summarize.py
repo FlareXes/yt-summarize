@@ -4,11 +4,14 @@
 import re
 import os
 import re
+import json
+import yt_dlp
 import requests
 import argparse
-import yt_dlp
-import json
 from itertools import groupby
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 MODEL = "starling-lm"
 API_URL = "http://localhost:11434/api/generate"
@@ -87,7 +90,7 @@ def summarize(prompt):
     data = json.dumps(data)
     headers = {"Content-Type": "application/json"}
 
-    response = requests.post(API_URL, data=data, headers=headers)
+    response = requests.post(API_URL, data=data, headers=headers, verify=False, timeout=10)
     json_response = response.json()
 
     if "response" in json_response:
