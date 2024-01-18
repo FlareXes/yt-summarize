@@ -1,4 +1,4 @@
-# Yt-Summarize: YouTube Subtitle Summarizer
+# Yt-Summarize
 
 Yt-Summarize is a command-line utility for summarizing YouTube videos based on their English subtitles. It utilizes a self-hosted language model for text summarization.
 
@@ -43,7 +43,7 @@ python yt_summarizer.py [-h] [-m MODEL] [-u URL] [--prompt-name PROMPT_NAME] [--
 
 ## Summary Prompts
 - **PROMPT_JSON_LOC**: Location of the `prompts.json` file. The file should contain a list of prompts with names and corresponding content.
-- You can add your's custom prompt in `prompt.json` with unique name and id. Then you can use it with `--prompt-name` option.
+- You can add your custom prompts in `prompt.json` with unique name and id. Then you can use it with `--prompt-name` option.
 
 ## Example
 
@@ -59,6 +59,9 @@ python yt_summarizer.py -m my_custom_model -u http://custom-api-url.com --prompt
 ```
 
 This command will use the specified model, API URL, and prompt to summarize the provided YouTube video.
+
+## Desktop Integration
+For easy access of script in Linux, Windows & MacOS, check out [setup documentation](https://github.com/FlareXes/yt-summarize/wiki/Setup).
 
 ## Contribute
 
